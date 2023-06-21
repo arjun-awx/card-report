@@ -4,7 +4,7 @@ import re
 import argparse
 import configparser
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 URI = 'https://api-demo.airwallex.com/api/v1'
 
@@ -12,20 +12,22 @@ config = configparser.ConfigParser()
 config.read('report.cfg')
 
 
-def formatted_daterange(type='yesterday', format='%Y-%m-%d'):
+def formatted_daterange(period='yesterday', format='%Y-%m-%d'):
     start_time = 'T00:00:00.000+0000'
     end_time = 'T23:59:59.999+0000'
+    print (period)
+
+    if period == 'yesterday':
+      daterange = (datetime.now() - timedelta(1)).strftime(format)
+    elif period == 'today':
+      daterange = datetime.now().strftime(format)
+    else:
+      daterange = period
     
-    if type == 'yesterday':
-      date = datetime.now() - timedelta(1)
-    elif type == 'today':
-       date = datetime.now()
-    
-    date = date.strftime(format)
-    return [date + start_time, date + end_time, date]
+    return [daterange + start_time, daterange + end_time, daterange]
 
 
-def get_transactions(daterange):
+def get_transactions(daterange='yesterday'):
   print("Generating Card Transaction Report")
   
   start_date, end_date, date = formatted_daterange(daterange)
@@ -139,9 +141,16 @@ if __name__ == '__main__':
   parser.add_argument("-d", "--daterange", help = "specify one of \"yesterday\" or \"today\"")
   args = vars(parser.parse_args())
 
-  if args["daterange"] == "today":
+  if args["daterange"] == "yesterday" or args["daterange"] is None:
+    daterange = "yesterday"
+  elif args["daterange"] == "today":
     daterange = "today"
   else:
-    daterange = "yesterday"
+    try:
+        date.fromisoformat(args["daterange"])
+    except ValueError:
+        raise ValueError("Date format is incorrect. It should be YYYY-MM-DD")
+      
+    daterange = args["daterange"]
 
   get_transactions(daterange)
