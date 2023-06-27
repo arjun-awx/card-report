@@ -1,21 +1,28 @@
 # card-report
-Generate Card Transaction Report
+Generate Airwallex Card Transactions Report
 
-To get started, install dependencies:
-python3 -m pip install requests
+## Setup
 
-Update report.cfg file with Airwallex API key and Client ID.
+Install dependencies:  
+`python3 -m pip install requests`
 
-To create a report with yesterday's transactions, run:
-python3 create-card-report.py
-or
-python3 create-card-report.py -d yesterday
+Update report.cfg file with [Airwallex API key and Client ID](https://www.airwallex.com/docs/api#/Getting_Started).
 
-To create a report with today's transactions, run:
-python3 create-card-report.py -d today
+## Usage
 
-To create a report of transcation with a custom date, run:
-python3 create-card-report.py -d YYYY-MM-DD
+To create a report with yesterday's transactions, run:  
+`python3 create-card-report.py`  
+or  
+`python3 create-card-report.py -d yesterday`  
+
+To create a report with today's transactions, run:  
+`python3 create-card-report.py -d today`  
+
+To create a report of transcation with a custom date, run:  
+`python3 create-card-report.py -d YYYY-MM-DD`  
+
+## Output
 
 Output CSV file is created in the same directory.
+
 Output file naming convention is report-YYYY-MM-DD.csv
