@@ -18,7 +18,7 @@ or
 To create a report with today's transactions, run:  
 `python3 create-card-report.py -d today`  
 
-To create a report of transcation with a custom date, run:  
+To create a report with transcations from a custom date, run:  
 `python3 create-card-report.py -d YYYY-MM-DD`  
 
 ## Output
