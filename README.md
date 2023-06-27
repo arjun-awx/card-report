@@ -25,4 +25,4 @@ To create a report with transcations from a custom date, run:
 
 Output CSV file is created in the same directory.
 
-Output file naming convention is report-YYYY-MM-DD.csv
+Output file naming convention is `report-YYYY-MM-DD.csv`
