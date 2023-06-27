@@ -15,7 +15,7 @@ To create a report with today's transactions, run:
 python3 create-card-report.py -d today
 
 To create a report of transcation with a custom date, run:
-python3 create-card-report.py -d <YYYY-MM-DD>
+python3 create-card-report.py -d YYYY-MM-DD
 
 Output CSV file is created in the same directory.
 Output file naming convention is report-YYYY-MM-DD.csv
