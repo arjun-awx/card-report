@@ -21,11 +21,11 @@ def formatted_daterange(daterange='yesterday', format='%Y-%m-%d'):
     if daterange == 'yesterday':
       start_date = end_date = datetime.now() - timedelta(1)
     elif daterange == 'today':
-      start_date = end_date  = datetime.now()
+      start_date = end_date = datetime.now()
     elif daterange == 'last_month':
       first_day_of_this_month = date.today().replace(day=1)
-      end_date = first_day_of_this_month - timedelta(days=1) # last day of last month
-      start_date = end_date.replace(day=1) # first day of last month
+      end_date = first_day_of_this_month - timedelta(days=1)  # last day of last month
+      start_date = end_date.replace(day=1)  # first day of last month
     elif daterange == 'this_month':
       end_date = date.today()
       start_date = end_date.replace(day=1)
@@ -34,11 +34,11 @@ def formatted_daterange(daterange='yesterday', format='%Y-%m-%d'):
 
     start_date = start_date.strftime(format) + start_time
     end_date = end_date.strftime(format) + end_time
-        
+
     return [start_date, end_date]
 
 
-def get_transactions(daterange='yesterday'):  
+def get_transactions(daterange='yesterday'):
   transcation_count = 0
   start_date, end_date = formatted_daterange(daterange)
   print('Fetching transcations from {} to {}'.format(start_date, end_date))
@@ -48,32 +48,31 @@ def get_transactions(daterange='yesterday'):
   else:
     report_filename = 'report-{}.csv'.format(start_date.split('T')[0])
 
-
   with open(report_filename, 'w', newline='') as file:
     writer = csv.writer(file)
     report_fields = [
-        'Transaction Date', 
-        'Transaction Time', 
-        'Transaction Type', 
-        'Transaction ID', 
-        'Card ID', 
-        'Card Nickname', 
-        'Client Data', 
-        'Status', 
-        'Billing Amount', 
-        'Billing Currency',	
-        'Transaction Amount',	
-        'Transaction Currency', 
-        'Masked Card Number', 
-        'Merchant Name', 
-        'Merchant City',	
-        'Merchant Country', 
-        'Merchant Category Code', 
-        'Posted Date', 
-        'Posted Time', 
-        'Failure Reason', 
-        'Auth Code', 
-        'Matched Authorizations', 
+        'Transaction Date',
+        'Transaction Time',
+        'Transaction Type',
+        'Transaction ID',
+        'Card ID',
+        'Card Nickname',
+        'Client Data',
+        'Status',
+        'Billing Amount',
+        'Billing Currency',
+        'Transaction Amount',
+        'Transaction Currency',
+        'Masked Card Number',
+        'Merchant Name',
+        'Merchant City',
+        'Merchant Country',
+        'Merchant Category Code',
+        'Posted Date',
+        'Posted Time',
+        'Failure Reason',
+        'Auth Code',
+        'Matched Authorizations',
         'Network Transcation ID'
       ]
     
@@ -97,8 +96,8 @@ def get_transactions(daterange='yesterday'):
 
     while True:
       payload = {
-                  'page_num': page_num, 
-                  'from_created_at': start_date, 
+                  'page_num': page_num,
+                  'from_created_at': start_date,
                   'to_created_at': end_date
                 }
       
@@ -110,15 +109,15 @@ def get_transactions(daterange='yesterday'):
       print('Processed page {}'.format(page_num))
 
       for transaction in transactions:
-        transaction_date, transaction_time, *_ = re.split('T|,|\.', transaction['transaction_date'])
-        posted_date, posted_time, *_ = re.split('T|,|\.', transaction['posted_date'])       
+        transaction_date, transaction_time, *_ = re.split(r'T|,|\.', transaction['transaction_date'])
+        posted_date, posted_time, *_ = re.split(r'T|,|\.', transaction['posted_date'])
         failure_reason = transaction.get('failure_reason', '')
         matched_authorizations = ''
 
         if 'matched_authorizations' in transaction:
-          matched_authorizations =  ', '.join(transaction['matched_authorizations'])
+          matched_authorizations = ', '.join(transaction['matched_authorizations'])
         
-        if not 'client_id' in transaction:
+        if 'client_id' not in transaction:
           transaction['client_data'] = ''
 
         transaction_reformatted = [
@@ -159,11 +158,11 @@ def get_transactions(daterange='yesterday'):
 if __name__ == '__main__':
   arg_desc = 'Generate Card Transaction Report'
   parser = argparse.ArgumentParser(description=arg_desc)
-  parser.add_argument('-d', '--daterange', help = 'specify one of {} \
+  parser.add_argument('-d', '--daterange', help='specify one of {} \
                       or custom date in YYYY-MM-DD format'.format(str(valid_daterange_values)[1:-1]))
   args = vars(parser.parse_args())
 
-  if 'daterange' in args: 
+  if 'daterange' in args:
     if args['daterange'] in valid_daterange_values:
       daterange = args['daterange']
     else:
