@@ -21,11 +21,16 @@ or
 To create a report with today's transactions, run:  
 `python3 create-card-report.py -d today`  
 
-To create a report with transcations from a custom date, run:  
+To create a report with transcations on a specific date, run:  
 `python3 create-card-report.py -d YYYY-MM-DD`  
+
+To create a monthly report, run:  
+`python3 create-card-report.py -d last_month`  
+or
+`python3 create-card-report.py -d this_month`  
 
 ## Output
 
 Output CSV file is created in the same directory.
 
-Output file naming convention is `report-YYYY-MM-DD.csv`
+Output file naming convention is `report-YYYY-MM.csv` for monthly report and `report-YYYY-MM-DD.csv` for report for a specific date.

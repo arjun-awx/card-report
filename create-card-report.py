@@ -11,54 +11,70 @@ URI = 'https://api-demo.airwallex.com/api/v1'
 config = configparser.ConfigParser()
 config.read('report.cfg')
 
+valid_daterange_values = ['yesterday', 'today', 'last_month', 'this_month']
 
-def formatted_daterange(period='yesterday', format='%Y-%m-%d'):
+
+def formatted_daterange(daterange='yesterday', format='%Y-%m-%d'):
     start_time = 'T00:00:00.000+0000'
     end_time = 'T23:59:59.999+0000'
-    print (period)
 
-    if period == 'yesterday':
-      daterange = (datetime.now() - timedelta(1)).strftime(format)
-    elif period == 'today':
-      daterange = datetime.now().strftime(format)
+    if daterange == 'yesterday':
+      start_date = end_date = datetime.now() - timedelta(1)
+    elif daterange == 'today':
+      start_date = end_date  = datetime.now()
+    elif daterange == 'last_month':
+      first_day_of_this_month = date.today().replace(day=1)
+      end_date = first_day_of_this_month - timedelta(days=1) # last day of last month
+      start_date = end_date.replace(day=1) # first day of last month
+    elif daterange == 'this_month':
+      end_date = date.today()
+      start_date = end_date.replace(day=1)
     else:
-      daterange = period
-    
-    return [daterange + start_time, daterange + end_time, daterange]
+        start_date = end_date = daterange
+
+    start_date = start_date.strftime(format) + start_time
+    end_date = end_date.strftime(format) + end_time
+        
+    return [start_date, end_date]
 
 
-def get_transactions(daterange='yesterday'):
-  print("Generating Card Transaction Report")
-  
-  start_date, end_date, date = formatted_daterange(daterange)
+def get_transactions(daterange='yesterday'):  
+  transcation_count = 0
+  start_date, end_date = formatted_daterange(daterange)
+  print('Fetching transcations from {} to {}'.format(start_date, end_date))
 
-  report_filename = 'report-{}.csv'.format(date)
+  if daterange == 'this_month' or daterange == 'last_month':
+    report_filename = 'report-{}.csv'.format(start_date.rsplit('-', 1)[0])
+  else:
+    report_filename = 'report-{}.csv'.format(start_date.split('T')[0])
+
+
   with open(report_filename, 'w', newline='') as file:
     writer = csv.writer(file)
     report_fields = [
-        "Transaction Date", 
-        "Transaction Time", 
-        "Transaction Type", 
-        "Transaction ID", 
-        "Card ID", 
-        "Card Nickname", 
-        "Client Data", 
-        "Status", 
-        "Billing Amount", 
-        "Billing Currency",	
-        "Transaction Amount",	
-        "Transaction Currency", 
-        "Masked Card Number", 
-        "Merchant Name", 
-        "Merchant City",	
-        "Merchant Country", 
-        "Merchant Category Code", 
-        "Posted Date", 
-        "Posted Time", 
-        "Failure Reason", 
-        "Auth Code", 
-        "Matched Authorizations", 
-        "Network Transcation ID"
+        'Transaction Date', 
+        'Transaction Time', 
+        'Transaction Type', 
+        'Transaction ID', 
+        'Card ID', 
+        'Card Nickname', 
+        'Client Data', 
+        'Status', 
+        'Billing Amount', 
+        'Billing Currency',	
+        'Transaction Amount',	
+        'Transaction Currency', 
+        'Masked Card Number', 
+        'Merchant Name', 
+        'Merchant City',	
+        'Merchant Country', 
+        'Merchant Category Code', 
+        'Posted Date', 
+        'Posted Time', 
+        'Failure Reason', 
+        'Auth Code', 
+        'Matched Authorizations', 
+        'Network Transcation ID'
       ]
     
     writer.writerow(report_fields)
@@ -88,8 +104,10 @@ def get_transactions(daterange='yesterday'):
       
       txn_request = requests.get(URI + '/issuing/transactions', params=payload, headers=headers)
       txn_response = txn_request.json()
-      transactions = txn_response["items"]
-      print("Processed page {}".format(page_num))
+      transactions = txn_response['items']
+      transcation_count = transcation_count + len(transactions)
+
+      print('Processed page {}'.format(page_num))
 
       for transaction in transactions:
         transaction_date, transaction_time, *_ = re.split('T|,|\.', transaction['transaction_date'])
@@ -99,6 +117,9 @@ def get_transactions(daterange='yesterday'):
 
         if 'matched_authorizations' in transaction:
           matched_authorizations =  ', '.join(transaction['matched_authorizations'])
+        
+        if not 'client_id' in transaction:
+          transaction['client_data'] = ''
 
         transaction_reformatted = [
             transaction_date,
@@ -131,26 +152,27 @@ def get_transactions(daterange='yesterday'):
       if txn_response['has_more']:
         page_num = page_num + 1
       else:
-        print("Processing complete")
+        print('Processing complete. Transcation count: {}'.format(transcation_count))
         break
 
 
 if __name__ == '__main__':
   arg_desc = 'Generate Card Transaction Report'
   parser = argparse.ArgumentParser(description=arg_desc)
-  parser.add_argument("-d", "--daterange", help = "specify one of \"yesterday\" or \"today\"")
+  parser.add_argument('-d', '--daterange', help = 'specify one of {} \
+                      or custom date in YYYY-MM-DD format'.format(str(valid_daterange_values)[1:-1]))
   args = vars(parser.parse_args())
 
-  if args["daterange"] == "yesterday" or args["daterange"] is None:
-    daterange = "yesterday"
-  elif args["daterange"] == "today":
-    daterange = "today"
+  if 'daterange' in args: 
+    if args['daterange'] in valid_daterange_values:
+      daterange = args['daterange']
+    else:
+      try:
+          daterange = date.fromisoformat(args['daterange'])
+      except ValueError:
+          raise ValueError('Invalid daterange value')
   else:
-    try:
-        date.fromisoformat(args["daterange"])
-    except ValueError:
-        raise ValueError("Date format is incorrect. It should be YYYY-MM-DD")
-      
-    daterange = args["daterange"]
+    daterange = 'yesterday'
 
+  print('Generating Card Transaction Report')
   get_transactions(daterange)
