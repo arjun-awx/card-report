@@ -26,8 +26,8 @@ To create a report with transcations on a specific date, run:
 
 To create a monthly report, run:  
 `python3 create-card-report.py -d last_month`  
-or
-`python3 create-card-report.py -d this_month`  
+or  
+`python3 create-card-report.py -d this_month`    
 
 ## Output
 
