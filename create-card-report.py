@@ -162,7 +162,7 @@ if __name__ == '__main__':
                       or custom date in YYYY-MM-DD format'.format(str(valid_daterange_values)[1:-1]))
   args = vars(parser.parse_args())
 
-  if 'daterange' in args:
+  if args['daterange']:
     if args['daterange'] in valid_daterange_values:
       daterange = args['daterange']
     else:
