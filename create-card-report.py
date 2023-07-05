@@ -6,7 +6,7 @@ import configparser
 
 from datetime import datetime, timedelta, date
 
-URI = 'https://api-demo.airwallex.com/api/v1'
+URI = 'https://api.airwallex.com/api/v1'
 
 config = configparser.ConfigParser()
 config.read('report.cfg')
