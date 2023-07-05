@@ -117,7 +117,7 @@ def get_transactions(daterange='yesterday'):
         if 'matched_authorizations' in transaction:
           matched_authorizations = ', '.join(transaction['matched_authorizations'])
         
-        if 'client_id' not in transaction:
+        if 'client_data' not in transaction:
           transaction['client_data'] = ''
 
         transaction_reformatted = [
