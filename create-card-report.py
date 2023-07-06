@@ -3,7 +3,7 @@ import csv
 import re
 import argparse
 import configparser
-
+from time import sleep
 from datetime import datetime, timedelta, date
 
 URI = 'https://api.airwallex.com/api/v1'
@@ -102,6 +102,7 @@ def get_transactions(daterange='yesterday'):
                 }
       
       txn_request = requests.get(URI + '/issuing/transactions', params=payload, headers=headers)
+      sleep(0.05)
       txn_response = txn_request.json()
       transactions = txn_response['items']
       transcation_count = transcation_count + len(transactions)
@@ -158,7 +159,7 @@ def get_transactions(daterange='yesterday'):
 if __name__ == '__main__':
   arg_desc = 'Generate Card Transaction Report'
   parser = argparse.ArgumentParser(description=arg_desc)
-  parser.add_argument('-d', '--daterange', help='specify one of {} \
+  parser.add_argument('-d', '--daterange', nargs='?', help='specify one of {} \
                       or custom date in YYYY-MM-DD format'.format(str(valid_daterange_values)[1:-1]))
   args = vars(parser.parse_args())
 
