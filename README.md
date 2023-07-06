@@ -4,8 +4,10 @@ Generate Airwallex Card Transactions Report. This script fetches transactions da
 ## Setup
 
 Install dependencies:  
-`python3 -m pip install requests`
-
+`python3 -m pip install requests`  
+or  
+`pip install -r requirements.txt`  
+  
 Update report.cfg file with [Airwallex API key and Client ID](https://www.airwallex.com/docs/api#/Getting_Started).
 
 ## Usage
